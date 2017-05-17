@@ -1,7 +1,8 @@
-
+(defvar table (make-hash-table))
 
 (defmacro def-class (classname &rest args)
  (let ((puta 1))
+ (setf (gethash classname table) (mapcar 'symbol-name args))
 `(progn
   (defun ,(intern (concatenate 'string "MAKE-"
                                (symbol-name classname)))
