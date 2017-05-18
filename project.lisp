@@ -3,17 +3,15 @@
 (defvar table-index (make-hash-table))
 (defvar table-size (make-hash-table))
 
-;(defmacro while (test &body body)
- ;   ((do ()
-  ;      ((not ,test))
-   ;     ,@body)))
-
 (defun turn-to-list (l)
     (cond ((not (listp l)) (list l))
         (t l)))
 
 (defun list-to-2d-array (list)
-  (map 'array #'identity list))  
+  (map 'array #'identity list)) 
+  
+(defun without-last(l)
+    (reverse (cdr (reverse l))))
   
 (defun unnest (x)
   (labels ((rec (x acc)
@@ -64,7 +62,6 @@
         
     ; set fields from a class to table
     (setf (gethash (get-class-to-tb-defined class-list) table-fields) args) 
-    ;(print "args")(print args)
     
     ; writing #fields table
     (setf (gethash (get-class-to-tb-defined class-list) table-size) (size-fields (get-class-to-tb-defined class-list)))
@@ -73,17 +70,23 @@
     (setf (gethash (get-class-to-tb-defined class-list) table-inheritance) (cdr class-list))
     
     (setf (gethash (get-class-to-tb-defined class-list) table-index) nil)
+    
     ; getting all keyword args ready && index ready
     (cond ((has_inheritance class-list) 
                 (setf all-keyword-args (append all-keyword-args (get-all-keyargs class-list)))
-                (let ((list-index-inh (list (1+ (list-length args))))
-                        (acum (1+ (list-length args))))
-                    (dolist (super (cddr class-list))
-                        (setf acum (+ acum (gethash super table-size)))
-                        (append list-index-inh (list acum)))
+                (let   ((acum 1) ; taking into account class name field
+                        (list-index-inh nil)) 
+                        (print (rest (rest class-list)))
+                        (print acum)
+                        
+                    (dolist (cl class-list)
+                        (print cl)
+                        (setf acum (+ acum (gethash cl table-size)))
+                        (setf list-index-inh (append list-index-inh (list acum)))
+                        (print acum))
+                    (setf list-index-inh (without-last list-index-inh))
+                    (print list-index-inh)
                 (setf (gethash (get-class-to-tb-defined class-list) table-index) list-index-inh))))
-    
-    (print all-keyword-args)
     
     `(progn
 
@@ -115,21 +118,20 @@
             (eval `(defun ,(intern (concatenate 'string (symbol-name (get-class-to-tb-defined class-list)) "-" (symbol-name el))) (object)
                 (let ((cls-name (get-class object))
                         (index 0))
-                (print cls-name)
+                ;(print cls-name)
                 (cond ((not (equal cls-name ,(symbol-name (get-class-to-tb-defined class-list)))) 
-                            (print "special code")
                             (setf index (get-index-class (intern cls-name) ',(get-class-to-tb-defined class-list)))
                             (aref object (1- (+ ,base-index index))))
-                      ('t (print "regular code") (aref object ,base-index))))))
+                      ('t (aref object ,base-index))))))
             (incf base-index)))))
 
         ;'(cond ((> base-index (size-fields (get-class-to-be-defined class-list)))))
                 ;`(,(intern (concatenate 'string (symbol-name (get-class-to-tb-defined class-list)) "-CLASS")) object)
         
-(print "PERSON CLASS")
+;(print "PERSON CLASS")
 (def-class person age name)
 (defvar p (make-person :age 10 :name "ola"))
-(print "IST CLASS")
+;(print "IST CLASS")
 (def-class (ist person) id)
 (defvar i (make-ist :id 1 :age 20 :name "matos"))
 
