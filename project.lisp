@@ -32,16 +32,24 @@
 
 (defun get-all-keyargs (class-list)
     (let ((keyargs nil))
+        (print "lista classes")
+        (print (cdr class-list))
         (dolist (el (cdr class-list) keyargs) 
-            (setf keyargs (append keyargs (gethash el table-fields)))
-            (setf keyargs (append keyargs (get-all-keyargs (gethash el table-inheritance))))
-            )))
-            
+            (setf keyargs (append keyargs (get-keyargs-of-class el))))))
+            ;(setf keyargs (append keyargs (get-all-keyargs (gethash el table-inheritance)))))))
+             
 (defun get-keyargs-of-class (cl)
     (gethash cl table-fields))
             
 (defun get-supers (cl) (gethash cl table-inheritance))
 
+(defun get-flatten-supers (cl-lst)
+    (cond 
+        ((equal cl-lst nil) nil)
+        ((equal (get-supers (first cl-lst)) nil) (list (first cl-lst)))
+        ('t (append (list (first cl-lst)) (get-flatten-supers (get-supers (first cl-lst))) (get-flatten-supers (rest cl-lst))))))
+                
+                
 (defun get-full-size (cl)
     (let ((acum (size-fields cl)))
         (dolist (c (get-supers cl) acum)
@@ -74,18 +82,16 @@
     ; getting all keyword args ready && index ready
     (cond ((has_inheritance class-list) 
                 (setf all-keyword-args (append all-keyword-args (get-all-keyargs class-list)))
+                (print "Keywords")
+                (print all-keyword-args)
+
                 (let   ((acum 1) ; taking into account class name field
                         (list-index-inh nil)) 
-                        (print (rest (rest class-list)))
-                        (print acum)
-                        
                     (dolist (cl class-list)
-                        (print cl)
                         (setf acum (+ acum (gethash cl table-size)))
-                        (setf list-index-inh (append list-index-inh (list acum)))
-                        (print acum))
+                        (setf list-index-inh (append list-index-inh (list acum))))
                     (setf list-index-inh (without-last list-index-inh))
-                    (print list-index-inh)
+
                 (setf (gethash (get-class-to-tb-defined class-list) table-index) list-index-inh))))
     
     `(progn
@@ -140,7 +146,8 @@
 (def-class musico genero)
 (def-class (croc animal musico) nome)
 (defvar c (make-croc :nome "SuperCroc" :peso 10 :altura 20 :genero "Jazz"))
-
+(def-class (kanguru mamifero musico) nome)
+(defvar k (make-kanguru :nome "PernaDePau" :pelo "curto" :leite "talvez" :peso 12 :altura 10 :genero "Rock"))
 ;(print "PHD CLASS")
 ;(def-class (phd ist) thesis)
 ;(defvar phd (make-phd :thesis "opah" :id 13 :age 21 :name "ler"))
