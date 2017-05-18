@@ -107,6 +107,7 @@
             ;(print (symbol-name el))
             ;(print (symbol-name (get-class-to-tb-defined class-list)))
             (eval `(defun ,(intern (concatenate 'string (symbol-name (get-class-to-tb-defined class-list)) "-" (symbol-name el))) (object)
+                ;`(,(intern (concatenate 'string (symbol-name (get-class-to-tb-defined class-list)) "-CLASS")) object)
                 (aref object ,puta)))
             (incf puta))
         )))
