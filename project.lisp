@@ -121,8 +121,7 @@
                             (setf index (get-index-class (intern cls-name) ',(get-class-to-tb-defined class-list)))
                             (aref object (1- (+ ,base-index index))))
                       ('t (print "regular code") (aref object ,base-index))))))
-            (incf base-index))
-        )))
+            (incf base-index)))))
 
         ;'(cond ((> base-index (size-fields (get-class-to-be-defined class-list)))))
                 ;`(,(intern (concatenate 'string (symbol-name (get-class-to-tb-defined class-list)) "-CLASS")) object)
@@ -133,6 +132,13 @@
 (print "IST CLASS")
 (def-class (ist person) id)
 (defvar i (make-ist :id 1 :age 20 :name "matos"))
+
+(def-class animal peso altura)
+(def-class (mamifero animal) pelo leite)
+(def-class musico genero)
+(def-class (croc animal musico) nome)
+(defvar c (make-croc :nome "SuperCroc" :peso 10 :altura 20 :genero "Jazz"))
+
 ;(print "PHD CLASS")
 ;(def-class (phd ist) thesis)
 ;(defvar phd (make-phd :thesis "opah" :id 13 :age 21 :name "ler"))
