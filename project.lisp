@@ -29,14 +29,16 @@
 
 (defun get-class-to-tb-defined (l) (car l))
 
+
+(defun get-keyargs-of-class (cl)
+    (gethash cl table-fields))
+
 (defun get-all-keyargs (class-list)
     (let ((keyargs nil))
         (dolist (el (cdr class-list) keyargs)
             (setf keyargs (append keyargs (get-keyargs-of-class el))))))
             ;(setf keyargs (append keyargs (get-all-keyargs (gethash el table-inheritance)))))))
 
-(defun get-keyargs-of-class (cl)
-    (gethash cl table-fields))
 
 (defun get-supers (cl) (gethash cl table-inheritance))
 
@@ -133,10 +135,11 @@
                                   (base-index 0))
                                   
                               (setf base-index (get-index-class (intern cls-name)  (intern ,(symbol-name (get-class-to-tb-defined class-list)))))
-                              (print base-index)
-                              (print size)
+                              ;(print base-index)
+                              ;(print size)
                               (dotimes (i size)
                                   (setf l-2-array (append l-2-array (list (aref object (+ base-index i))))))
+                              (print l-2-array)    
                               (aref (list-to-2d-array l-2-array) ,field-index)))
                             
                       ('t (aref object ,field-index))))))
@@ -146,19 +149,19 @@
                 ;`(,(intern (concatenate 'string (symbol-name (get-class-to-tb-defined class-list)) "-CLASS")) object)
 
 ;(print "PERSON CLASS")
-(def-class person age name)
-(defvar p (make-person :age 10 :name "ola"))
+;(def-class person age name)
+;(defvar p (make-person :age 10 :name "ola"))
 ;(print "IST CLASS")
-(def-class (ist person) id)
-(defvar i (make-ist :id 1 :age 20 :name "matos"))
+;(def-class (ist person) id)
+;(defvar i (make-ist :id 1 :age 20 :name "matos"))
 
-(def-class animal peso altura)
-(def-class (mamifero animal) pelo leite)
-(def-class musico genero)
-(def-class (croc animal musico) nome)
-(defvar c (make-croc :nome "SuperCroc" :peso 10 :altura 20 :genero "Jazz"))
-(def-class (kanguru mamifero musico) nome)
-(defvar k (make-kanguru :nome "PernaDePau" :pelo "curto" :leite "talvez" :peso 12 :altura 10 :genero "Rock"))
+;(def-class animal peso altura)
+;(def-class (mamifero animal) pelo leite)
+;(def-class musico genero)
+;(def-class (croc animal musico) nome)
+;(defvar c (make-croc :nome "SuperCroc" :peso 10 :altura 20 :genero "Jazz"))
+;(def-class (kanguru mamifero musico) nome)
+;(defvar k (make-kanguru :nome "PernaDePau" :pelo "curto" :leite "talvez" :peso 12 :altura 10 :genero "Rock"))
 ;(print "PHD CLASS")
 ;(def-class (phd ist) thesis)
 ;(defvar phd (make-phd :thesis "opah" :id 13 :age 21 :name "ler"))

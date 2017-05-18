@@ -25,7 +25,9 @@
 
 (let ((s (make-student :name "Paul" :age 21 :course "Informatics")))
   (make-assertions
+   (print "pessoa-nome")
    (equal (person-name s) "Paul")
+   (print "st-course")
    (equal (student-course s) "Informatics")))
 
 (let ((m (make-ist-student :name "Maria" :course "IA" :activity "Tennis")))
@@ -33,6 +35,7 @@
    ;(ist-student? m)
    ;(student? m)
    ;(sportsman? m)
+   (print "ist-st-name")
    (equal (ist-student-name m) "Maria")
    (equal (person-name m) "Maria")
    (equal (sportsman-activity m) "Tennis")
