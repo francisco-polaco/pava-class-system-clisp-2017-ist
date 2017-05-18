@@ -7,8 +7,8 @@
     (cond ((not (listp l)) (list l))
         (t l)))
 
-;(defun list-to-2d-array (list)
- ; (map 'array #'identity list))
+(defun list-to-2d-array (list)
+  (map 'array #'identity list))
 
 (defun without-last(l)
     (reverse (cdr (reverse l))))
@@ -54,10 +54,11 @@
 
 (defun get-index-class (cl inh-cl)
     (let ((pos 0)
-            (cnt -1))
+            (cnt 1)) ; classname
     (dolist (c (get-flatten-supers (list cl)) pos)
-        (incf cnt)
-        (cond ((equal c inh-cl) (setf pos cnt))))))
+
+        (cond ((equal c inh-cl) (setf pos cnt))
+              ('t (setf cnt (+ cnt (size-fields c))))))))
         ;(print pos)
     ;(nth pos (gethash cl table-index))))
 
@@ -119,18 +120,25 @@
             ;(print (symbol-name el))
             ;(print (symbol-name (get-class-to-tb-defined class-list)))
             (eval `(defun ,(intern (concatenate 'string (symbol-name (get-class-to-tb-defined class-list)) "-" (symbol-name el))) (object)
-                (let ((cls-name (get-class object))
-                        (index 0)
-                        (base-index 0))
+                (let ((cls-name (get-class object)))
                 ;(print cls-name)
                 (cond ((not (equal cls-name ,(symbol-name (get-class-to-tb-defined class-list))))
-                            (print (intern cls-name))
-                            (print ,(symbol-name (get-class-to-tb-defined class-list)))
-                            (setf base-index (get-index-class (intern cls-name)  ,(symbol-name (get-class-to-tb-defined class-list))))
-                            (print base-index)
-                            ;(setf index (get-index-class (intern cls-name) ',(get-class-to-tb-defined class-list)))
-                            (aref object (+ ,field-index index)))
-                      
+                                                        ; (print "ola")
+                            ; (print (intern cls-name))
+                            ; (print (intern ,(symbol-name (get-class-to-tb-defined class-list))))
+                            ; (print (get-index-class (intern cls-name)  (intern ,(symbol-name (get-class-to-tb-defined class-list)))))
+
+                            (let ((size (size-fields (intern ,(symbol-name (get-class-to-tb-defined class-list)))))
+                                  (l-2-array '(,(symbol-name (get-class-to-tb-defined class-list))))
+                                  (base-index 0))
+                                  
+                              (setf base-index (get-index-class (intern cls-name)  (intern ,(symbol-name (get-class-to-tb-defined class-list)))))
+                              (print base-index)
+                              (print size)
+                              (dotimes (i size)
+                                  (setf l-2-array (append l-2-array (list (aref object (+ base-index i))))))
+                              (aref (list-to-2d-array l-2-array) ,field-index)))
+                            
                       ('t (aref object ,field-index))))))
             (incf field-index)))))
 
