@@ -58,7 +58,7 @@
     (nth pos (gethash cl table-index))))
             
 (defmacro def-class (classname &rest args)
- (let ((puta 1)
+ (let ((base-index 1)
         (class-list (turn-to-list classname))
         (all-keyword-args args))
         
@@ -74,14 +74,17 @@
     
     (setf (gethash (get-class-to-tb-defined class-list) table-index) nil)
     ; getting all keyword args ready && index ready
-    (cond ((has_inheritance class-list) (setf all-keyword-args (append all-keyword-args (get-all-keyargs class-list)))
-                                        (let ((list-index-inh (list (1+ (list-length args))))
-                                                (acum (1+ (list-length args))))
-                                            (dolist (super (cddr class-list))
-                                                (setf acum (+ acum (gethash super table-size)))
-                                                (append list-index-inh (list acum)))
-                                            (setf (gethash (get-class-to-tb-defined class-list) table-index) list-index-inh))))
+    (cond ((has_inheritance class-list) 
+                (setf all-keyword-args (append all-keyword-args (get-all-keyargs class-list)))
+                (let ((list-index-inh (list (1+ (list-length args))))
+                        (acum (1+ (list-length args))))
+                    (dolist (super (cddr class-list))
+                        (setf acum (+ acum (gethash super table-size)))
+                        (append list-index-inh (list acum)))
+                (setf (gethash (get-class-to-tb-defined class-list) table-index) list-index-inh))))
+    
     (print all-keyword-args)
+    
     `(progn
 
         ;make
@@ -92,7 +95,7 @@
             (vector ,(symbol-name (get-class-to-tb-defined class-list)) ,@all-keyword-args ))
 
         
-        ;getClass
+        ;get-class
         (defun ,(intern "GET-CLASS") (object)
             (aref object 0))
         
@@ -116,12 +119,12 @@
                 (cond ((not (equal cls-name ,(symbol-name (get-class-to-tb-defined class-list)))) 
                             (print "special code")
                             (setf index (get-index-class (intern cls-name) ',(get-class-to-tb-defined class-list)))
-                            (aref object (1- (+ ,puta index))))
-                      ('t (print "regular code") (aref object ,puta))))))
-            (incf puta))
+                            (aref object (1- (+ ,base-index index))))
+                      ('t (print "regular code") (aref object ,base-index))))))
+            (incf base-index))
         )))
 
-        ;'(cond ((> puta (size-fields (get-class-to-be-defined class-list)))))
+        ;'(cond ((> base-index (size-fields (get-class-to-be-defined class-list)))))
                 ;`(,(intern (concatenate 'string (symbol-name (get-class-to-tb-defined class-list)) "-CLASS")) object)
         
 (print "PERSON CLASS")
