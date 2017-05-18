@@ -7,8 +7,8 @@
     (cond ((not (listp l)) (list l))
         (t l)))
 
-(defun list-to-2d-array (list)
-  (map 'array #'identity list))
+;(defun list-to-2d-array (list)
+ ; (map 'array #'identity list))
 
 (defun without-last(l)
     (reverse (cdr (reverse l))))
@@ -20,9 +20,8 @@
       (t (rec (car x) (rec (cdr x) acc))))))
     (rec x nil)))
 
-(defun get-batata (x)
-    (print "yey")
-    (vector (symbol-name x)  (unnest (gethash x table-fields))))
+;(defun get-batata (x)
+;    (vector (symbol-name x)  (unnest (gethash x table-fields))))
 
 (defun has_inheritance (lst) (not (equal (list-length lst) 1)))
 
@@ -32,8 +31,6 @@
 
 (defun get-all-keyargs (class-list)
     (let ((keyargs nil))
-        (print "lista classes")
-        (print (cdr class-list))
         (dolist (el (cdr class-list) keyargs)
             (setf keyargs (append keyargs (get-keyargs-of-class el))))))
             ;(setf keyargs (append keyargs (get-all-keyargs (gethash el table-inheritance)))))))
@@ -84,7 +81,6 @@
                 (setf all-keyword-args (unnest (mapcar 'get-keyargs-of-class (get-flatten-supers (list (car class-list))))))
                 (print "Keywords")
                 (print all-keyword-args)
-                (print (unnest (mapcar 'get-keyargs-of-class (get-flatten-supers (list (car class-list))))))
                 (let   ((acum 1) ; taking into account class name field
                         (list-index-inh nil))
                     (dolist (cl class-list)
@@ -135,19 +131,19 @@
                 ;`(,(intern (concatenate 'string (symbol-name (get-class-to-tb-defined class-list)) "-CLASS")) object)
 
 ;(print "PERSON CLASS")
-(def-class person age name)
-(defvar p (make-person :age 10 :name "ola"))
+;(def-class person age name)
+;(defvar p (make-person :age 10 :name "ola"))
 ;(print "IST CLASS")
-(def-class (ist person) id)
-(defvar i (make-ist :id 1 :age 20 :name "matos"))
+;(def-class (ist person) id)
+;(defvar i (make-ist :id 1 :age 20 :name "matos"))
 
-(def-class animal peso altura)
-(def-class (mamifero animal) pelo leite)
-(def-class musico genero)
-(def-class (croc animal musico) nome)
-(defvar c (make-croc :nome "SuperCroc" :peso 10 :altura 20 :genero "Jazz"))
-(def-class (kanguru mamifero musico) nome)
-(defvar k (make-kanguru :nome "PernaDePau" :pelo "curto" :leite "talvez" :peso 12 :altura 10 :genero "Rock"))
+;(def-class animal peso altura)
+;(def-class (mamifero animal) pelo leite)
+;(def-class musico genero)
+;(def-class (croc animal musico) nome)
+;(defvar c (make-croc :nome "SuperCroc" :peso 10 :altura 20 :genero "Jazz"))
+;(def-class (kanguru mamifero musico) nome)
+;(defvar k (make-kanguru :nome "PernaDePau" :pelo "curto" :leite "talvez" :peso 12 :altura 10 :genero "Rock"))
 ;(print "PHD CLASS")
 ;(def-class (phd ist) thesis)
 ;(defvar phd (make-phd :thesis "opah" :id 13 :age 21 :name "ler"))
