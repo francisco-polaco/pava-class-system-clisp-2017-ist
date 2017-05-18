@@ -39,6 +39,9 @@
             (setf keyargs (append keyargs (get-all-keyargs (gethash el table-inheritance))))
             )))
             
+(defun get-keyargs-of-class (cl)
+    (gethash cl table-fields))
+            
 (defun get-supers (cl) (gethash cl table-inheritance))
 
 (defun get-full-size (cl)
@@ -90,7 +93,7 @@
 
         
         ;getClass
-        (defun ,(intern (concatenate 'string (symbol-name (get-class-to-tb-defined class-list)) "-CLASS")) (object)
+        (defun ,(intern "GET-CLASS") (object)
             (aref object 0))
         
         ;instance TODO
@@ -107,11 +110,18 @@
             ;(print (symbol-name el))
             ;(print (symbol-name (get-class-to-tb-defined class-list)))
             (eval `(defun ,(intern (concatenate 'string (symbol-name (get-class-to-tb-defined class-list)) "-" (symbol-name el))) (object)
-                ;`(,(intern (concatenate 'string (symbol-name (get-class-to-tb-defined class-list)) "-CLASS")) object)
-                (aref object ,puta)))
+                (let ((cls-name (get-class object)))
+                (print cls-name)
+                (cond ((not (equal cls-name ,(symbol-name (get-class-to-tb-defined class-list)))) 
+                            (print "special code")
+                            )
+                      ('t (print "regular code") (aref object ,puta))))))
             (incf puta))
         )))
 
+        ;'(cond ((> puta (size-fields (get-class-to-be-defined class-list)))))
+                ;`(,(intern (concatenate 'string (symbol-name (get-class-to-tb-defined class-list)) "-CLASS")) object)
+        
 (print "PERSON CLASS")
 (def-class person age name)
 (defvar p (make-person :age 10 :name "ola"))
