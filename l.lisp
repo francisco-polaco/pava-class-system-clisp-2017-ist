@@ -1,7 +1,7 @@
 (defvar table-fields (make-hash-table))
 (defvar table-inheritance (make-hash-table))
 (defvar table-index (make-hash-table))
-
+(defvar table-size (make-hash-table))
 
 ;(defmacro while (test &body body)
  ;   ((do ()
@@ -29,56 +29,97 @@
 (defun has_inheritance (lst) (not (equal (list-length lst) 1)))
 
 (defun size-fields (cl) (list-length (gethash cl table-fields)))
-  
+
+(defun get-class-to-tb-defined (l) (car l))
+
+(defun get-all-keyargs (class-list)
+    (let ((keyargs nil))
+        (dolist (el (cdr class-list) keyargs) 
+            (setf keyargs (append keyargs (gethash el table-fields)))
+            (setf keyargs (append keyargs (get-all-keyargs (gethash el table-inheritance))))
+            )))
+            
+(defun get-supers (cl) (gethash cl table-inheritance))
+
+(defun get-full-size (cl)
+    (let ((acum (size-fields cl)))
+        (dolist (c (get-supers cl) acum)
+            (setf acum (+ acum (get-full-size c))))))
+            
+(defun get-index-class (cl inh-cl)
+    (let ((pos 0)
+            (cnt -1))
+    (dolist (c (gethash cl table-inheritance))
+        (incf cnt)
+        (cond ((equal c inh-cl) (setf pos cnt))))
+    (nth pos (gethash cl table-index))))
+            
 (defmacro def-class (classname &rest args)
  (let ((puta 1)
         (class-list (turn-to-list classname))
-        (args-concat args))
+        (all-keyword-args args))
         
     ; set fields from a class to table
-    (setf (gethash (car class-list) table-fields) args) 
+    (setf (gethash (get-class-to-tb-defined class-list) table-fields) args) 
+    ;(print "args")(print args)
     
-    ; getting all keyword args ready && inheritance table ready
-    (cond ((has_inheritance class-list) (setf (gethash (car class-list) table-inheritance) (cdr class-list))
-                                        (dolist (el (cdr class-list)) 
-                                            (setf args-concat (append args-concat (gethash el table-fields))))))
+    ; writing #fields table
+    (setf (gethash (get-class-to-tb-defined class-list) table-size) (size-fields (get-class-to-tb-defined class-list)))
+    
+    ;inheritance table ready
+    (setf (gethash (get-class-to-tb-defined class-list) table-inheritance) (cdr class-list))
+    
+    (setf (gethash (get-class-to-tb-defined class-list) table-index) nil)
+    ; getting all keyword args ready && index ready
+    (cond ((has_inheritance class-list) (setf all-keyword-args (append all-keyword-args (get-all-keyargs class-list)))
+                                        (let ((list-index-inh (list (1+ (list-length args))))
+                                                (acum (1+ (list-length args))))
+                                            (dolist (super (cddr class-list))
+                                                (setf acum (+ acum (gethash super table-size)))
+                                                (append list-index-inh (list acum)))
+                                            (setf (gethash (get-class-to-tb-defined class-list) table-index) list-index-inh))))
+    (print all-keyword-args)
     `(progn
 
         ;make
         (defun ,(intern (concatenate 'string "MAKE-"
-                                    (symbol-name (car class-list))))
-                        (&key ,@args-concat)
+                                    (symbol-name (get-class-to-tb-defined class-list))))
+                        (&key ,@all-keyword-args)
             
-            (vector ,(symbol-name (car class-list)) ,@args-concat ))
+            (vector ,(symbol-name (get-class-to-tb-defined class-list)) ,@all-keyword-args ))
 
         
         ;getClass
-        (defun ,(intern (concatenate 'string (symbol-name (car class-list)) "-CLASS")) (person)
-            (aref person 0))
+        (defun ,(intern (concatenate 'string (symbol-name (get-class-to-tb-defined class-list)) "-CLASS")) (object)
+            (aref object 0))
         
-        ;instance
-        (defun ,(intern (concatenate 'string (symbol-name (car class-list)) "?")) (person)
-            (cond ((arrayp person) 
-                    (cond ((equal (car (array-dimensions person)) (+ (list-length ',args) 1)) 
-                    (equalp ,(symbol-name (car class-list)) (aref person 0)))
+        ;instance TODO
+        (defun ,(intern (concatenate 'string (symbol-name (get-class-to-tb-defined class-list)) "?")) (object)
+            (cond ((arrayp object) 
+                    (cond ((equal (car (array-dimensions object)) (+ (list-length ',args) 1)) 
+                    (equalp ,(symbol-name (get-class-to-tb-defined class-list)) (aref object 0)))
                     ('t nil)))
                 ('t nil)))
                 
         
         ;getters       
-        ,(dolist (el args-concat)
+        ,(dolist (el all-keyword-args)
             ;(print (symbol-name el))
-            ;(print (symbol-name (car class-list)))
-            (eval `(defun ,(intern (concatenate 'string (symbol-name (car class-list)) "-" (symbol-name el))) (person)
-                (aref person ,puta)))
+            ;(print (symbol-name (get-class-to-tb-defined class-list)))
+            (eval `(defun ,(intern (concatenate 'string (symbol-name (get-class-to-tb-defined class-list)) "-" (symbol-name el))) (object)
+                (aref object ,puta)))
             (incf puta))
         )))
 
+(print "PERSON CLASS")
 (def-class person age name)
 (defvar p (make-person :age 10 :name "ola"))
+(print "IST CLASS")
 (def-class (ist person) id)
 (defvar i (make-ist :id 1 :age 20 :name "matos"))
-
+;(print "PHD CLASS")
+;(def-class (phd ist) thesis)
+;(defvar phd (make-phd :thesis "opah" :id 13 :age 21 :name "ler"))
 
 
 ; (defmacro def-class12 (&body args)
