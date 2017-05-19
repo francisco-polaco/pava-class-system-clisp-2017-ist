@@ -8,8 +8,6 @@
     (cond ((not (listp l)) (list l))
         (t l)))
 
-;(defun list-to-array (list)
-;  (map 'array #'identity list))
 
 (defun without-last(l)
     (reverse (cdr (reverse l))))
