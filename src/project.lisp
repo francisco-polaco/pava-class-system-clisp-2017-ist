@@ -116,14 +116,9 @@
                     (let ((cls-name (get-class object)))
                     (cond ((not (equal cls-name ,(symbol-name (get-class-to-be-defined class-list))))
 
-                                (let ((size (get-full-size (intern ,(symbol-name (get-class-to-be-defined class-list)))))
-                                    (super-class '(,(symbol-name (get-class-to-be-defined class-list))))
-                                    (base-index 0))
-                                    
+                                (let ((base-index 0))
                                     (setf base-index (get-index-class (intern cls-name)  (intern ,(symbol-name (get-class-to-be-defined class-list)))))
-                                    (dotimes (i size)
-                                        (setf super-class (append super-class (list (nth  (+ base-index i) object)))))
-                                    (nth ,field-index super-class)))
+                                    (nth (1-(+ ,field-index base-index)) object)))
                                 
                         ('t (nth ,field-index object ))))))
                 (incf field-index))
@@ -135,14 +130,9 @@
                    (let ((cls-name (get-class object)))
                         (cond ((not (equal cls-name ,(symbol-name (get-class-to-be-defined class-list))))
 
-                                    (let ((size (get-full-size (intern ,(symbol-name (get-class-to-be-defined class-list)))))
-                                        (super-class '(,(symbol-name (get-class-to-be-defined class-list))))
-                                        (base-index 0))
-                                        
+                                    (let ((base-index 0))
                                         (setf base-index (get-index-class (intern cls-name)  (intern ,(symbol-name (get-class-to-be-defined class-list)))))
-                                        (dotimes (i size)
-                                            (setf super-class (append super-class (list (nth (+ base-index i) object )))))
-                                        (setf (nth ,field-index super-class) value)))
+                                        (setf (nth (1-(+ ,field-index base-index)) object) value)))
                                     
                             ('t (setf (nth ,field-index object) value))))))
                 (incf field-index)))))
