@@ -25,9 +25,7 @@
 
 (let ((s (make-student :name "Paul" :age 21 :course "Informatics")))
   (make-assertions
-   (print "pessoa-nome")
    (equal (person-name s) "Paul")
-   (print "st-course")
    (equal (student-course s) "Informatics")))
 
 (let ((m (make-ist-student :name "Maria" :course "IA" :activity "Tennis")))
@@ -35,13 +33,9 @@
    (ist-student? m)
    (student? m)
    (sportsman? m)
-   (print "ist-st-name")
    (equal (ist-student-name m) "Maria")
-   (print "person-name")
    (equal (person-name m) "Maria")
-   (print "sportsman activity")
    (equal (sportsman-activity m) "Tennis")
-   (print "ist activity")
    (equal (ist-student-activity m) "Tennis")))
 
 (let ((b (make-phd-student :name "Brian" :age 28 :course "Informatics" :activity "Soccer" :group "ESW" :thesis "Code Migration")))
@@ -51,11 +45,26 @@
    (student? b)
    (sportsman? b)
    (phd-student? b)
-   (print "phd tese")
    (equal (phd-student-thesis b) "Code Migration")
-   (print "student name")
    (equal (student-name b) "Brian")
-   (print "phd student group")
    (equal (phd-student-group b) "ESW")
-   (print "phd student name")
    (equal (phd-student-name b) "Brian")))
+
+; setters test   
+   
+(let ((b (make-phd-student :name "Brian" :age 28 :course "Informatics" :activity "Soccer" :group "ESW" :thesis "Code Migration")))
+  (make-assertions
+   (researcher? b)
+   (person? b)
+   (student? b)
+   (sportsman? b)
+   (phd-student? b)
+   (set-phd-student-thesis b "Byzantine Fault Tolerance")
+   (equal (phd-student-thesis b) "Byzantine Fault Tolerance")
+   (set-student-name b "Miguel")
+   (equal (student-name b) "Miguel")
+   (set-phd-student-group b "DS")
+   (equal (phd-student-group b) "DS")
+   (set-phd-student-name b "Manuel")
+   (equal (phd-student-name b) "Manuel")))   
+   
