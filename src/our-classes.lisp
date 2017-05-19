@@ -1,8 +1,6 @@
 (load "load.lisp")
-(print "PERSON CLASS")
 (def-class person age name)
 (defvar p (make-person :age 10 :name "ola"))
-(print "IST CLASS")
 (def-class (ist person) id)
 (defvar i (make-ist :id 1 :age 20 :name "matos"))
 
