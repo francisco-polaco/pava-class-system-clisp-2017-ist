@@ -130,13 +130,13 @@
                             ; (print (intern ,(symbol-name (get-class-to-tb-defined class-list))))
                             ; (print (get-index-class (intern cls-name)  (intern ,(symbol-name (get-class-to-tb-defined class-list)))))
 
-                            (let ((size (size-fields (intern ,(symbol-name (get-class-to-tb-defined class-list)))))
+                            (let ((size (get-full-size (intern ,(symbol-name (get-class-to-tb-defined class-list)))))
                                   (l-2-array '(,(symbol-name (get-class-to-tb-defined class-list))))
                                   (base-index 0))
                                   
                               (setf base-index (get-index-class (intern cls-name)  (intern ,(symbol-name (get-class-to-tb-defined class-list)))))
-                              ;(print base-index)
-                              ;(print size)
+                              (print base-index)
+                              (print size)
                               (dotimes (i size)
                                   (setf l-2-array (append l-2-array (list (aref object (+ base-index i))))))
                               (print l-2-array)    
