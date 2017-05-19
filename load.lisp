@@ -1,1 +1,1 @@
-(load (compile-file "project.lisp"))
+(load (compile-file "src/project.lisp"))
