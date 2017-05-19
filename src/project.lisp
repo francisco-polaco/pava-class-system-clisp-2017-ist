@@ -8,8 +8,8 @@
     (cond ((not (listp l)) (list l))
         (t l)))
 
-(defun list-to-2d-array (list)
-  (map 'array #'identity list))
+;(defun list-to-array (list)
+;  (map 'array #'identity list))
 
 (defun without-last(l)
     (reverse (cdr (reverse l))))
@@ -57,10 +57,6 @@
         (cond ((equal c inh-cl) (setf pos cnt))
               ('t (setf cnt (+ cnt (size-fields c))))))))
 
-(defun instance-of-p (c to-test)
-    (and (arrayp to-test)
-         (or (equalp (symbol-name c) (aref to-test 0))
-            (not (equal (member c (get-flatten-supers (list (intern (aref to-test 0))))) nil)))))
     
 (defmacro def-class (classname &rest args)
     (let ((field-index 1)
@@ -97,19 +93,19 @@
                                         (symbol-name (get-class-to-be-defined class-list))))
                             (&key ,@all-keyword-args)
 
-                (vector ,(symbol-name (get-class-to-be-defined class-list)) ,@all-keyword-args ))
+                (list ,(symbol-name (get-class-to-be-defined class-list)) ,@all-keyword-args ))
 
 
             ;get-class
             (defun ,(intern "GET-CLASS") (object)
-                (aref object 0))
+                (nth 0 object))
 
             ;instance
             (defun ,(intern (concatenate 'string (symbol-name (get-class-to-be-defined class-list)) "?")) (object)
                 (let ((c ',(get-class-to-be-defined class-list)))
-                    (cond ((and (arrayp object)
-                                (or (equalp (symbol-name c) (aref object 0))
-                                    (not (equal (member c (get-flatten-supers (list (intern (aref object 0))))) nil)))) 't)
+                    (cond ((and (listp object)
+                                (or (equalp (symbol-name c) (nth 0 object))
+                                    (not (equal (member c (get-flatten-supers (list (intern (nth 0 object))))) nil)))) 't)
                         ('t nil))))
 
 
@@ -121,15 +117,15 @@
                     (cond ((not (equal cls-name ,(symbol-name (get-class-to-be-defined class-list))))
 
                                 (let ((size (get-full-size (intern ,(symbol-name (get-class-to-be-defined class-list)))))
-                                    (l-2-array '(,(symbol-name (get-class-to-be-defined class-list))))
+                                    (super-class '(,(symbol-name (get-class-to-be-defined class-list))))
                                     (base-index 0))
                                     
                                     (setf base-index (get-index-class (intern cls-name)  (intern ,(symbol-name (get-class-to-be-defined class-list)))))
                                     (dotimes (i size)
-                                        (setf l-2-array (append l-2-array (list (aref object (+ base-index i))))))
-                                    (aref (list-to-2d-array l-2-array) ,field-index)))
+                                        (setf super-class (append super-class (list (nth  (+ base-index i) object)))))
+                                    (nth ,field-index super-class)))
                                 
-                        ('t (aref object ,field-index))))))
+                        ('t (nth ,field-index object ))))))
                 (incf field-index))
             ,(setf field-index 1)    
            
@@ -140,13 +136,13 @@
                         (cond ((not (equal cls-name ,(symbol-name (get-class-to-be-defined class-list))))
 
                                     (let ((size (get-full-size (intern ,(symbol-name (get-class-to-be-defined class-list)))))
-                                        (l-2-array '(,(symbol-name (get-class-to-be-defined class-list))))
+                                        (super-class '(,(symbol-name (get-class-to-be-defined class-list))))
                                         (base-index 0))
                                         
                                         (setf base-index (get-index-class (intern cls-name)  (intern ,(symbol-name (get-class-to-be-defined class-list)))))
                                         (dotimes (i size)
-                                            (setf l-2-array (append l-2-array (list (aref object (+ base-index i))))))
-                                        (setf (aref (list-to-2d-array l-2-array) ,field-index) value)))
+                                            (setf super-class (append super-class (list (nth (+ base-index i) object )))))
+                                        (setf (nth ,field-index super-class) value)))
                                     
-                            ('t (setf (aref object ,field-index) value))))))
+                            ('t (setf (nth ,field-index object) value))))))
                 (incf field-index)))))
