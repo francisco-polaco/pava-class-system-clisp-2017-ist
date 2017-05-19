@@ -1,4 +1,4 @@
-(load "load.lisp")
+(load "project.lisp")
 (def-class person age name)
 (defvar p (make-person :age 10 :name "ola"))
 (def-class (ist person) id)
