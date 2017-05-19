@@ -11,6 +11,3 @@
 (defvar c (make-croc :nome "SuperCroc" :peso 10 :altura 20 :genero "Jazz"))
 (def-class (kanguru mamifero musico) nome)
 (defvar k (make-kanguru :nome "PernaDePau" :pelo "curto" :leite "talvez" :peso 12 :altura 10 :genero "Rock"))
-;(print "PHD CLASS")
-;(def-class (phd ist) thesis)
-;(defvar phd (make-phd :thesis "opah" :id 13 :age 21 :name "ler"))

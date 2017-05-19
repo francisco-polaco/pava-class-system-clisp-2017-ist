@@ -49,7 +49,7 @@
 
 (defun get-index-class (cl inh-cl)
     (let ((pos 0)
-            (cnt 1)) ; classname
+            (cnt 1)) ; skipping classname
     (dolist (c (get-flatten-supers (list cl)) pos)
 
         (cond ((equal c inh-cl) (setf pos cnt))
